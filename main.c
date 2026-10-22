@@ -76,6 +76,7 @@ int main(void)
             }
             nrf_delay_ms(1500);
         }
+        nrf_delay_ms(2000);
     }
 }
 

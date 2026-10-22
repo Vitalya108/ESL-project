@@ -152,3 +152,8 @@ $(DFU_PACKAGE): $(OUTPUT_DIRECTORY)/nrf52840_xxaa.hex
 dfu: $(DFU_PACKAGE)
 	@echo Performing DFU with generated package
 	nrfutil dfu usb-serial -pkg $< -p $(DFU_PORT) -b 115200
+
+.PHONY: clean
+
+clean:
+	rm -rf _build

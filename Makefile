@@ -145,6 +145,7 @@ $(DFU_PACKAGE): $(OUTPUT_DIRECTORY)/nrf52840_xxaa.hex
 	   --hw-version 52 \
 	   --application-version 1 \
 	   --sd-req 0x0,0x102 \
+	   --sd-id 0x102 \
 	   --application $< \
 	    $@
 

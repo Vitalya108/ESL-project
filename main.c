@@ -53,6 +53,8 @@
 #include "nrf_delay.h"
 #include "boards.h"
 
+static int donlge_num[4] = {9, 0, 9, 9};
+
 /**
  * @brief Function for application main entry.
  */
@@ -64,7 +66,6 @@ int main(void)
     /* Toggle LEDs. */
     while (true)
     {
-        int donlge_num[4] = {9, 0, 9, 9};
 
         for (int i = 0; i < LEDS_NUMBER; i++)
         {

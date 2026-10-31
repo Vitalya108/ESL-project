@@ -71,9 +71,9 @@ int main(void)
         {
             for (int j = 0; j < donlge_num[i]; j++) {
                 bsp_board_led_invert(i);
-                nrf_delay_ms(500);
+                nrf_delay_ms(300);
                 bsp_board_led_invert(i);
-                nrf_delay_ms(500);
+                nrf_delay_ms(300);
             }
             nrf_delay_ms(1500);
         }

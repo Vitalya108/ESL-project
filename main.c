@@ -51,36 +51,79 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "nrf_delay.h"
-#include "boards.h"
+#include "nrf_gpio.h"
 
-static int donlge_num[4] = {9, 0, 9, 9};
+#define R_LED_PIN NRF_GPIO_PIN_MAP(0, 8)
+#define G_LED_PIN NRF_GPIO_PIN_MAP(1, 9)
+#define B_LED_PIN NRF_GPIO_PIN_MAP(0, 12)
+
+typedef enum {
+    R, G, B
+} color;
+
+
+static const uint32_t SWITCH1_PIN = NRF_GPIO_PIN_MAP(1, 6);
+
+static const color sequence[] = {
+    G, G, G, G, G, G, G, G, G,
+    B, B, B, B, B, B, B, B, B
+};
+
+static const int seq_length = sizeof(sequence) / sizeof(sequence[0]);
+
+static void off_all_leds() {
+    nrf_gpio_pin_set(R_LED_PIN);
+    nrf_gpio_pin_set(G_LED_PIN);
+    nrf_gpio_pin_set(B_LED_PIN);
+}
+
+static void blink_color(color c) {
+        switch (c) {
+            case R: 
+                nrf_gpio_pin_clear(R_LED_PIN);
+                nrf_delay_ms(300);
+                nrf_gpio_pin_set(R_LED_PIN);
+                nrf_delay_ms(300);
+                break;
+            case G: 
+                nrf_gpio_pin_clear(G_LED_PIN);
+                nrf_delay_ms(300);
+                nrf_gpio_pin_set(G_LED_PIN);
+                nrf_delay_ms(300);
+                break;
+            case B: 
+                nrf_gpio_pin_clear(B_LED_PIN);
+                nrf_delay_ms(300);
+                nrf_gpio_pin_set(B_LED_PIN);
+                nrf_delay_ms(300);
+                break;
+        }
+    }
 
 /**
  * @brief Function for application main entry.
  */
 int main(void)
 {
-    /* Configure board. */
-    bsp_board_init(BSP_INIT_LEDS);
+    off_all_leds();
+    nrf_gpio_cfg_output(R_LED_PIN);
+    nrf_gpio_cfg_output(G_LED_PIN);
+    nrf_gpio_cfg_output(B_LED_PIN);
 
-    /* Toggle LEDs. */
+    nrf_gpio_cfg_input(SWITCH1_PIN, NRF_GPIO_PIN_PULLUP);
+
+    int current_index = 0;
+
+
     while (true)
     {
-
-        for (int i = 0; i < LEDS_NUMBER; i++)
-        {
-            for (int j = 0; j < donlge_num[i]; j++) {
-                bsp_board_led_invert(i);
-                nrf_delay_ms(300);
-                bsp_board_led_invert(i);
-                nrf_delay_ms(300);
+    
+        if (nrf_gpio_pin_read(SWITCH1_PIN) == 0) {
+            blink_color(sequence[current_index]);
+            current_index++;
+            if (current_index >= seq_length) {
+                current_index = 0;
             }
-            nrf_delay_ms(1500);
         }
-        nrf_delay_ms(2000);
     }
 }
-
-/**
- *@}
- **/

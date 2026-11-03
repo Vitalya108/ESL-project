@@ -94,17 +94,24 @@ static void turn_off_color(color c) {
     nrf_gpio_pin_set(led_pin);
 }
 
+static void init_leds() {
+    nrf_gpio_cfg_output(R_LED_PIN);
+    nrf_gpio_cfg_output(G_LED_PIN);
+    nrf_gpio_cfg_output(B_LED_PIN);
+}
+
+static void init_switch() {
+    nrf_gpio_cfg_input(SWITCH1_PIN, NRF_GPIO_PIN_PULLUP);
+}
+
 /**
  * @brief Function for application main entry.
  */
 int main(void)
 {
     off_all_leds();
-    nrf_gpio_cfg_output(R_LED_PIN);
-    nrf_gpio_cfg_output(G_LED_PIN);
-    nrf_gpio_cfg_output(B_LED_PIN);
-
-    nrf_gpio_cfg_input(SWITCH1_PIN, NRF_GPIO_PIN_PULLUP);
+    init_leds();
+    init_switch();
 
     int current_index = 0; 
 

@@ -56,6 +56,7 @@
 #define R_LED_PIN NRF_GPIO_PIN_MAP(0, 8)
 #define G_LED_PIN NRF_GPIO_PIN_MAP(1, 9)
 #define B_LED_PIN NRF_GPIO_PIN_MAP(0, 12)
+#define SWITCH1_PIN NRF_GPIO_PIN_MAP(1, 6)
 
 typedef enum {
     R, G, B
@@ -69,8 +70,6 @@ static int get_led_pin_by_color(color c) {
         default: return -1;
     }
 }
-
-static const uint32_t SWITCH1_PIN = NRF_GPIO_PIN_MAP(1, 6);
 
 static const color color_array[] = {
     G, G, G, G, G, G, G, G, G,

@@ -111,7 +111,7 @@ int main(void)
 
     while (true)
     {
-        // bool pressed = nrf_gpio_pin_read(SWITCH1_PIN) == 0;
+        
         color cur_color = color_array[current_index];
 
         if (nrf_gpio_pin_read(SWITCH1_PIN) == 0) {

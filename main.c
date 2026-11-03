@@ -61,15 +61,23 @@ typedef enum {
     R, G, B
 } color;
 
+static int get_led_pin_by_color(color c) {
+    switch(c) {
+        case R: return R_LED_PIN;
+        case G: return G_LED_PIN;
+        case B: return B_LED_PIN;
+        default: return -1;
+    }
+}
 
 static const uint32_t SWITCH1_PIN = NRF_GPIO_PIN_MAP(1, 6);
 
-static const color sequence[] = {
+static const color color_array[] = {
     G, G, G, G, G, G, G, G, G,
     B, B, B, B, B, B, B, B, B
 };
 
-static const int seq_length = sizeof(sequence) / sizeof(sequence[0]);
+static const int col_arr_length = sizeof(color_array) / sizeof(color_array[0]);
 
 static void off_all_leds() {
     nrf_gpio_pin_set(R_LED_PIN);
@@ -77,28 +85,15 @@ static void off_all_leds() {
     nrf_gpio_pin_set(B_LED_PIN);
 }
 
-static void blink_color(color c) {
-        switch (c) {
-            case R: 
-                nrf_gpio_pin_clear(R_LED_PIN);
-                nrf_delay_ms(300);
-                nrf_gpio_pin_set(R_LED_PIN);
-                nrf_delay_ms(300);
-                break;
-            case G: 
-                nrf_gpio_pin_clear(G_LED_PIN);
-                nrf_delay_ms(300);
-                nrf_gpio_pin_set(G_LED_PIN);
-                nrf_delay_ms(300);
-                break;
-            case B: 
-                nrf_gpio_pin_clear(B_LED_PIN);
-                nrf_delay_ms(300);
-                nrf_gpio_pin_set(B_LED_PIN);
-                nrf_delay_ms(300);
-                break;
-        }
-    }
+static void turn_on_color(color c) {
+    int led_pin = get_led_pin_by_color(c);
+    nrf_gpio_pin_clear(led_pin);
+}
+
+static void turn_off_color(color c) {
+    int led_pin = get_led_pin_by_color(c);
+    nrf_gpio_pin_set(led_pin);
+}
 
 /**
  * @brief Function for application main entry.
@@ -112,17 +107,26 @@ int main(void)
 
     nrf_gpio_cfg_input(SWITCH1_PIN, NRF_GPIO_PIN_PULLUP);
 
-    int current_index = 0;
-
+    int current_index = 0; 
 
     while (true)
     {
-    
+        // bool pressed = nrf_gpio_pin_read(SWITCH1_PIN) == 0;
+        color cur_color = color_array[current_index];
+
         if (nrf_gpio_pin_read(SWITCH1_PIN) == 0) {
-            blink_color(sequence[current_index]);
-            current_index++;
-            if (current_index >= seq_length) {
-                current_index = 0;
+            turn_on_color(cur_color);
+            nrf_delay_ms(500);
+            
+            if (nrf_gpio_pin_read(SWITCH1_PIN) != 0) {
+                continue;
+            } else {
+                turn_off_color(cur_color);
+                nrf_delay_ms(500);
+                current_index++;
+                if (current_index >= col_arr_length) {
+                    current_index = 0;
+                }
             }
         }
     }

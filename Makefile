@@ -17,7 +17,27 @@ SRC_FILES += \
   $(SDK_ROOT)/components/boards/boards.c \
   $(PROJ_DIR)/main.c \
   $(PROJ_DIR)/include/leds.c \
+  $(PROJ_DIR)/include/pwm.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_systick.c \
   $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c \
+#   $(SDK_ROOT)/components/libraries/log/src/nrf_log_frontend.c \
+#   $(SDK_ROOT)/components/libraries/log/src/nrf_log_str_formatter.c \
+#   $(SDK_ROOT)/components/libraries/log/src/nrf_log_backend_usb.c \
+#   $(SDK_ROOT)/components/libraries/log/src/nrf_log_default_backends.c \
+#   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_usbd.c \
+#   $(SDK_ROOT)/components/libraries/usbd/app_usbd.c \
+#   $(SDK_ROOT)/components/libraries/usbd/app_usbd_core.c \
+#   $(SDK_ROOT)/components/libraries/usbd/class/cdc/acm/app_usbd_cdc_acm.c \
+#   $(SDK_ROOT)/components/libraries/usbd/app_usbd_string_desc.c \
+#   $(SDK_ROOT)/components/libraries/atomic_fifo/nrf_atfifo.c \
+#   $(SDK_ROOT)/components/libraries/atomic/nrf_atomic.c \
+#   $(SDK_ROOT)/components/libraries/balloc/nrf_balloc.c \
+#   $(SDK_ROOT)/components/libraries/memobj/nrf_memobj.c \
+#   $(SDK_ROOT)/components/libraries/ringbuf/nrf_ringbuf.c \
+#   $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_clock.c \
+#   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_clock.c \
+#   $(SDK_ROOT)/components/libraries/timer/app_timer2.c \
+#   $(SDK_ROOT)/components/libraries/timer/drv_rtc.c \
 
 # Include folders common to all targets
 INC_FOLDERS += \
@@ -36,6 +56,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/bsp \
   $(SDK_ROOT)/components/libraries/log \
   $(SDK_ROOT)/modules/nrfx \
+  $(SDK_ROOT)/modules/nrfx/drivers/include \
   $(SDK_ROOT)/components/libraries/experimental_section_vars \
   $(SDK_ROOT)/components/libraries/delay \
   $(SDK_ROOT)/integration/nrfx \
@@ -45,6 +66,15 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/memobj \
   $(SDK_ROOT)/external/fprintf \
   $(SDK_ROOT)/components/libraries/log/src \
+#   $(SDK_ROOT)/components/libraries/usbd \
+#   $(SDK_ROOT)/components/libraries/usbd/class/cdc/acm \
+#   $(SDK_ROOT)/components/libraries/atomic_fifo \
+#   $(SDK_ROOT)/components/libraries/sortlist \
+#   $(SDK_ROOT)/components/libraries/queue \
+#   $(SDK_ROOT)/components/libraries/timer \
+#   $(SDK_ROOT)/components/libraries/mutex \
+#   $(SDK_ROOT)/external/utf_converter \
+#   $(SDK_ROOT)/components/libraries/pwr_mgmt \
 
 # Libraries common to all targets
 LIB_FILES += \

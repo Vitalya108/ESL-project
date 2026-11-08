@@ -3,41 +3,48 @@
 #include "nrf_delay.h"
 #include "nrf_gpio.h"
 #include "leds.h"
+#include "nrfx_gpiote.h"
+#include "pwm.h"
+#include "nrfx_systick.h"
 
-static const color color_array[] = {
-    G, G, G, G, G, G, G, G, G,
-    B, B, B, B, B, B, B, B, B
-};
+// static const color color_array[] = {
+//     G, G, G, G, G, G, G, G, G,
+//     B, B, B, B, B, B, B, B, B
+// };
 
-static const int col_arr_length = sizeof(color_array) / sizeof(color_array[0]);
+// static const int col_arr_length = sizeof(color_array) / sizeof(color_array[0]);
+
+// static void button_handler(void) {
+
+// }
 
 int main(void)
 {
+    
+
     init_leds();
     init_switch1();
     off_all_leds();
 
-    int current_index = 0; 
+
+
+    // int current_index = 0; 
+    int duty_cycle = 0;
+    int delta = 1;
+    nrfx_systick_init();
 
     while (true)
     {
-        
-        color cur_color = color_array[current_index];
+        // color cur_color = color_array[current_index]; 
 
-        if (SWITCH1_PRESSED) {
-            turn_on_color(cur_color);
-            nrf_delay_ms(500);
-            
-            if (SWITCH1_RELEASED) {
-                continue;
-            } else {
-                turn_off_color(cur_color);
-                nrf_delay_ms(500);
-                current_index++;
-                if (current_index >= col_arr_length) {
-                    current_index = 0;
-                }
-            }
+        do_pwm_step(duty_cycle * 10, B); 
+    
+        
+        duty_cycle += delta;
+
+        if (duty_cycle > 100 || duty_cycle < 0) {
+            delta *= -1;
+            duty_cycle += delta;
         }
     }
 }

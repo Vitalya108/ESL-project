@@ -1,6 +1,8 @@
 #ifndef LEDS_H
 #define LEDS_H
 
+#include "nrf_gpio.h"
+
 #define R_LED_PIN NRF_GPIO_PIN_MAP(0, 8)
 #define G_LED_PIN NRF_GPIO_PIN_MAP(1, 9)
 #define B_LED_PIN NRF_GPIO_PIN_MAP(0, 12)

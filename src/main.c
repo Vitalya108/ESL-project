@@ -5,6 +5,8 @@
 #include "nrfx_gpiote.h"
 #include "nrfx_systick.h"
 
+#include "nrf_delay.h"
+
 #include "app_timer.h"
 #include "app_timer_utils.h"
 
@@ -19,19 +21,16 @@
 #include "app_usbd.h"
 #include "app_usbd_serial_num.h"
 
-// static const color color_array[] = {
-//     G, G, G, G, G, G, G, G, G,
-//     B, B, B, B, B, B, B, B, B
-// };
+static const color color_array[] = {
+    G, G, G, G, G, G, G, G, G,
+    B, B, B, B, B, B, B, B, B
+};
 
-// static const int col_arr_length = sizeof(color_array) / sizeof(color_array[0]);
+static const int col_arr_length = sizeof(color_array) / sizeof(color_array[0]);
 
 static volatile bool button_pressed = false;
 static volatile bool button_double_clicked = false;
-static bool waiting_for_second_click = false;
-static bool led_is_on = false;
-int duty_cycle = 0;
-int blink_speed = 20;
+static volatile bool waiting_for_second_click = false;
 
 //timer def
 APP_TIMER_DEF(SW1_DEBOUNCE_TIMER_ID);
@@ -95,49 +94,56 @@ int main(void)
     nrfx_gpiote_in_init(SWITCH1_PIN, &config, switch1_handler);
     nrfx_gpiote_in_event_enable(SWITCH1_PIN, true);
 
-
-    int cur_duty = duty_cycle;
-
-    // int current_index = 0; 
+    static bool led_is_on = true;
+    int current_brightness = 0; 
+    int brightness_step = 10;
+    int direction = 1;          
+    int cur_color_index = 0; 
 
     while (true)
     {
-        // color cur_color = color_array[current_index]; 
+        color cur_color = color_array[cur_color_index]; 
 
         if (button_double_clicked) {
-            NRF_LOG_INFO("Button double clicked enter %d", cur_duty);
-
+            NRF_LOG_INFO("Button double clicked enter");
+            
             button_double_clicked = false;
-            
             led_is_on = !led_is_on;
-            
-            if (led_is_on) {
-                NRF_LOG_INFO("LED ON");
-                cur_duty = duty_cycle;
-            } else {
-                NRF_LOG_INFO("LED OFF");
-                cur_duty = 0;
-            }
-            NRF_LOG_INFO("Button double clicked exit %d \n", cur_duty);
+
+            NRF_LOG_INFO("Button double clicked exit\n");
         }
         else if (button_pressed) {
-            NRF_LOG_INFO("Button pressed enter");
+            if (led_is_on) {    
+                NRF_LOG_INFO("Button pressed enter");
 
-            button_pressed = false;
+                button_pressed = false;
 
-            if (led_is_on) {
-                
-                duty_cycle += blink_speed;
-
-                if (duty_cycle > 100 || duty_cycle < 0) {
-                    blink_speed *= -1;
-                    duty_cycle += blink_speed;
+                brightness_step--;
+                if (brightness_step < 1) {
+                    brightness_step = 10; 
                 }
-                cur_duty = duty_cycle;
+                NRF_LOG_INFO("Cur step = %d", brightness_step)
+                NRF_LOG_INFO("Button pressed exit \n");
             }
-            NRF_LOG_INFO("Button pressed exit \n");
         }
-        do_pwm_step(cur_duty * 10, B);
+        if (led_is_on) {
+            current_brightness += (direction * brightness_step);
+            
+            if (current_brightness >= 100) {
+                current_brightness = 100;
+                direction = -1;
+            } else if (current_brightness <= 0) {
+                current_brightness = 0;
+                direction = 1;
+                cur_color_index++;
+                if (cur_color_index >= col_arr_length) {
+                    cur_color_index = 0;
+                }
+            }
+        }
+        do_pwm_step(current_brightness  * 10, cur_color);
+        
+        nrf_delay_ms(20);
         process_front_and_usb();
     }
 }

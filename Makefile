@@ -18,6 +18,7 @@ SRC_FILES += \
   $(PROJ_DIR)/src/main.c \
   $(PROJ_DIR)/src/leds.c \
   $(PROJ_DIR)/src/pwm.c \
+  $(PROJ_DIR)/src/app_timer_utils.c \
   $(PROJ_DIR)/src/my_logs.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_systick.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_gpiote.c \

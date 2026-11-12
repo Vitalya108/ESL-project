@@ -4,9 +4,9 @@
 #include "nrf_gpio.h"
 #include "nrfx_gpiote.h"
 #include "nrfx_systick.h"
+
 #include "app_timer.h"
-#include "drv_rtc.h"
-#include "nrf_drv_clock.h"
+#include "app_timer_utils.h"
 
 #include "leds.h"
 #include "pwm.h"
@@ -27,39 +27,51 @@
 // static const int col_arr_length = sizeof(color_array) / sizeof(color_array[0]);
 
 static volatile bool button_pressed = false;
-// static bool sw1_is_pressed = false; 
+static volatile bool button_double_clicked = false;
+static bool waiting_for_second_click = false;
+static bool led_is_on = false;
 int duty_cycle = 0;
-int delta = 5;
+int blink_speed = 20;
 
-//timer vars and def
-// APP_TIMER_DEF(sw1_db_timer_id);
+//timer def
+APP_TIMER_DEF(SW1_DEBOUNCE_TIMER_ID);
+APP_TIMER_DEF(SW1_DOUBLE_CLICK_ID);
 
-// static void switch1_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
-// {
-//     app_timer_stop(sw1_db_timer_id);
-//     app_timer_start(sw1_db_timer_id, APP_TIMER_TICKS(30), NULL);
-// }
+static void switch1_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
 
-static void switch1_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
-    button_pressed = true;
+    if (SWITCH1_PRESSED) {
+        app_timer_stop(SW1_DEBOUNCE_TIMER_ID);
+        app_timer_start(SW1_DEBOUNCE_TIMER_ID, APP_TIMER_TICKS(30), NULL);
+    }
 }
 
-// static void switch1_db_timer_handler(void * p_context)
-// {
-//     bool pressed = (nrf_gpio_pin_read(SWITCH1_PIN) == 0);
+static void switch1_debounce_timer_handler(void * p_context)
+{
+    if (SWITCH1_PRESSED) {
+        if (waiting_for_second_click) {
+            app_timer_stop(SW1_DOUBLE_CLICK_ID);
+            waiting_for_second_click = false;
+            button_double_clicked = true;
+        } else {
+            waiting_for_second_click = true;
+            app_timer_start(SW1_DOUBLE_CLICK_ID, APP_TIMER_TICKS(300), NULL);
+        }
+    }
+}
 
-//     if (pressed && !sw1_is_pressed) {
-//         button_pressed = true;
-//     }
-//     sw1_is_pressed = pressed;
-// }
+static void switch1_double_click_handler(void * p_context)
+{
+    waiting_for_second_click = false;
+    button_pressed = true; 
+}
 
 
 int main(void)
 {
     // logs initialization
     logs_init();
-    NRF_LOG_INFO("Starting up the test project with USB logging");
+    NRF_LOG_INFO("Main function started");
     process_front_and_usb();
 
     // leds initializations and turns off
@@ -69,16 +81,10 @@ int main(void)
     // systick initializetion
     nrfx_systick_init();
 
-    // timer initializetion
-    // ret_code_t err = nrf_drv_clock_init();
-    // if (err != NRF_ERROR_MODULE_ALREADY_INITIALIZED) {
-    //     APP_ERROR_CHECK(err);
-    // }
-    // nrf_drv_clock_lfclk_request(NULL);
-    // while (!nrf_drv_clock_lfclk_is_running()) {}
-    // app_timer_init();
-    // app_timer_create(&sw1_db_timer_id, APP_TIMER_MODE_SINGLE_SHOT, switch1_db_timer_handler);
-
+    // timers initializetion
+    init_app_timer_and_lfck();
+    app_timer_create(&SW1_DEBOUNCE_TIMER_ID, APP_TIMER_MODE_SINGLE_SHOT, switch1_debounce_timer_handler);
+    app_timer_create(&SW1_DOUBLE_CLICK_ID, APP_TIMER_MODE_SINGLE_SHOT, switch1_double_click_handler);
 
     // gpiote initialization
     nrfx_gpiote_init();
@@ -90,6 +96,7 @@ int main(void)
     nrfx_gpiote_in_event_enable(SWITCH1_PIN, true);
 
 
+    int cur_duty = duty_cycle;
 
     // int current_index = 0; 
 
@@ -97,23 +104,40 @@ int main(void)
     {
         // color cur_color = color_array[current_index]; 
 
-        if (button_pressed) {
+        if (button_double_clicked) {
+            NRF_LOG_INFO("Button double clicked enter %d", cur_duty);
 
+            button_double_clicked = false;
+            
+            led_is_on = !led_is_on;
+            
+            if (led_is_on) {
+                NRF_LOG_INFO("LED ON");
+                cur_duty = duty_cycle;
+            } else {
+                NRF_LOG_INFO("LED OFF");
+                cur_duty = 0;
+            }
+            NRF_LOG_INFO("Button double clicked exit %d \n", cur_duty);
+        }
+        else if (button_pressed) {
             NRF_LOG_INFO("Button pressed enter");
-            process_front_and_usb();
 
             button_pressed = false;
 
-            duty_cycle += delta;
+            if (led_is_on) {
+                
+                duty_cycle += blink_speed;
 
-            if (duty_cycle > 100 || duty_cycle < 0) {
-                delta *= -1;
-                duty_cycle += delta;
+                if (duty_cycle > 100 || duty_cycle < 0) {
+                    blink_speed *= -1;
+                    duty_cycle += blink_speed;
+                }
+                cur_duty = duty_cycle;
             }
-            NRF_LOG_INFO("Button pressed exit");
+            NRF_LOG_INFO("Button pressed exit \n");
         }
-        do_pwm_step(duty_cycle * 10, B);
-        
+        do_pwm_step(cur_duty * 10, B);
         process_front_and_usb();
     }
 }

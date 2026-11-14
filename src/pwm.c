@@ -1,4 +1,4 @@
-#include "leds.h"
+#include "leds_switch.h"
 #include "nrfx_systick.h"
 #include "nrf_gpio.h"
 #include "pwm.h"

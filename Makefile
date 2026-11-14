@@ -16,8 +16,9 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/mdk/gcc_startup_nrf52840.S \
   $(SDK_ROOT)/components/boards/boards.c \
   $(PROJ_DIR)/src/main.c \
-  $(PROJ_DIR)/src/leds.c \
+  $(PROJ_DIR)/src/leds_switch.c \
   $(PROJ_DIR)/src/pwm.c \
+  $(PROJ_DIR)/src/interrupts.c \
   $(PROJ_DIR)/src/app_timer_utils.c \
   $(PROJ_DIR)/src/my_logs.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_systick.c \

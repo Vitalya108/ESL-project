@@ -9,8 +9,9 @@
 
 #include "app_timer.h"
 #include "app_timer_utils.h"
+#include "interrupts.h"
 
-#include "leds.h"
+#include "leds_switch.h"
 #include "pwm.h"
 
 #include "my_logs.h"              
@@ -28,44 +29,6 @@ static const color color_array[] = {
 
 static const int col_arr_length = sizeof(color_array) / sizeof(color_array[0]);
 
-static volatile bool button_pressed = false;
-static volatile bool button_double_clicked = false;
-static volatile bool waiting_for_second_click = false;
-
-//timer def
-APP_TIMER_DEF(SW1_DEBOUNCE_TIMER_ID);
-APP_TIMER_DEF(SW1_DOUBLE_CLICK_ID);
-
-static void switch1_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
-{
-
-    if (SWITCH1_PRESSED) {
-        app_timer_stop(SW1_DEBOUNCE_TIMER_ID);
-        app_timer_start(SW1_DEBOUNCE_TIMER_ID, APP_TIMER_TICKS(30), NULL);
-    }
-}
-
-static void switch1_debounce_timer_handler(void * p_context)
-{
-    if (SWITCH1_PRESSED) {
-        if (waiting_for_second_click) {
-            app_timer_stop(SW1_DOUBLE_CLICK_ID);
-            waiting_for_second_click = false;
-            button_double_clicked = true;
-        } else {
-            waiting_for_second_click = true;
-            app_timer_start(SW1_DOUBLE_CLICK_ID, APP_TIMER_TICKS(300), NULL);
-        }
-    }
-}
-
-static void switch1_double_click_handler(void * p_context)
-{
-    waiting_for_second_click = false;
-    button_pressed = true; 
-}
-
-
 int main(void)
 {
     // logs initialization
@@ -82,8 +45,8 @@ int main(void)
 
     // timers initializetion
     init_app_timer_and_lfck();
-    app_timer_create(&SW1_DEBOUNCE_TIMER_ID, APP_TIMER_MODE_SINGLE_SHOT, switch1_debounce_timer_handler);
-    app_timer_create(&SW1_DOUBLE_CLICK_ID, APP_TIMER_MODE_SINGLE_SHOT, switch1_double_click_handler);
+    create_debounce_timer();
+    create_double_click_timer();
 
     // gpiote initialization
     nrfx_gpiote_init();
@@ -122,7 +85,7 @@ int main(void)
                 if (brightness_step < 1) {
                     brightness_step = 10; 
                 }
-                NRF_LOG_INFO("Cur step = %d", brightness_step)
+                NRF_LOG_INFO("Cur step = %d", brightness_step);
                 NRF_LOG_INFO("Button pressed exit \n");
             }
         }

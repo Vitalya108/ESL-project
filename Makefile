@@ -19,8 +19,10 @@ SRC_FILES += \
   $(PROJ_DIR)/src/leds_switch.c \
   $(PROJ_DIR)/src/pwm.c \
   $(PROJ_DIR)/src/interrupts.c \
+  $(PROJ_DIR)/src/hsv.c \
   $(PROJ_DIR)/src/app_timer_utils.c \
   $(PROJ_DIR)/src/my_logs.c \
+  $(PROJ_DIR)/src/nrfx_pwm_utils.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_systick.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_gpiote.c \
   $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c \
@@ -51,6 +53,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/log/src/nrf_log_backend_uart.c \
   $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_power.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_power.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_pwm.c \
   $(SDK_ROOT)/components/libraries/stack_guard/nrf_stack_guard.c \
   $(SDK_ROOT)/external/utf_converter/utf.c \
   $(SDK_ROOT)/modules/nrfx/soc/nrfx_atomic.c \

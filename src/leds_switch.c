@@ -34,6 +34,7 @@ void init_leds() {
     nrf_gpio_cfg_output(R_LED_PIN);
     nrf_gpio_cfg_output(G_LED_PIN);
     nrf_gpio_cfg_output(B_LED_PIN);
+    nrf_gpio_cfg_output(LED1_PIN);
 }
 
 void init_switch1() {

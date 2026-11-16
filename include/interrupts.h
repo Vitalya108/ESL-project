@@ -8,6 +8,7 @@
 extern volatile bool button_pressed;
 extern volatile bool button_double_clicked;
 extern volatile bool waiting_for_second_click;
+extern volatile bool button_holds;
 
 void switch1_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 

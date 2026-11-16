@@ -31,7 +31,10 @@ void init_nrfx_pwm() {
     APP_ERROR_CHECK(nrfx_pwm_init(&m_pwm0, &config, NULL));
 }
 
-
+void set_led1_duty(int duty) {
+    m_pwm_values.channel_3 = duty;
+    nrfx_pwm_simple_playback(&m_pwm0, &m_seq, 1, NRFX_PWM_FLAG_LOOP);
+}
 
 void set_led_color_hsv(int h, int s, int v) {
     int r, g, b;

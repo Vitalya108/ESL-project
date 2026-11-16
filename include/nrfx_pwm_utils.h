@@ -7,4 +7,6 @@ void set_led_color_rgb(int r, int g, int b);
 
 void set_led_color_hsv(int h, int s, int v);
 
+void set_led1_duty(int duty);
+
 #endif

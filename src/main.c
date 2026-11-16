@@ -1,36 +1,20 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "nrf_gpio.h"
 #include "nrfx_gpiote.h"
-// #include "nrfx_systick.h"
 
 #include "nrf_delay.h"
 
-#include "app_timer.h"
 #include "app_timer_utils.h"
 #include "interrupts.h"
 
 #include "leds_switch.h"
-#include "pwm.h"
 #include "nrfx_pwm_utils.h"
 
 #include "hsv.h"
 
-#include "my_logs.h"              
-#include "nrf_log.h"              
-#include "nrf_log_ctrl.h"         
-#include "nrf_log_default_backends.h" 
-#include "nrf_log_backend_usb.h"
-#include "app_usbd.h"
-#include "app_usbd_serial_num.h"
-
-// static const color color_array[] = {
-//     G, G, G, G, G, G, G, G, G,
-//     B, B, B, B, B, B, B, B, B
-// };
-
-// static const int col_arr_length = sizeof(color_array) / sizeof(color_array[0]);
+#include "my_logs.h"                      
+#include "nrf_log.h"         
 
 int main(void)
 {
@@ -38,13 +22,6 @@ int main(void)
     logs_init();
     NRF_LOG_INFO("Main function started");
     process_front_and_usb();
-
-    // leds initializations and turns off
-    init_leds();
-    off_all_leds();
-
-    // systick initializetion
-    // nrfx_systick_init();
 
     // timers initializetion
     init_app_timer_and_lfck();
@@ -66,62 +43,77 @@ int main(void)
     // color vars
     int h = 360 * 0.99;
     int s = 100;
-    int v = 50;
+    int v = 100;
 
-    // static bool led_is_on = true;
-    // int current_brightness = 0; 
-    // int brightness_step = 10;
-    // int direction = 1;          
-    // int cur_color_index = 0; 
+    int current_brightness = 0; 
 
+    // hsv color initialization
     set_led_color_hsv(h, s, v);
+    int cur_mode = 0;
+    int led1_blink_dir = 1;
+    int led1_blink_speed = 0;
 
     while (true)
     {
+        if (button_double_clicked) {
 
-        
-        // color cur_color = color_array[cur_color_index]; 
-
-        // if (button_double_clicked) {
-        //     NRF_LOG_INFO("Button double clicked enter");
+            NRF_LOG_INFO("Button double clicked cur mode = %d, blink speed = %d", cur_mode, led1_blink_speed);
             
-        //     button_double_clicked = false;
-        //     led_is_on = !led_is_on;
-
-        //     NRF_LOG_INFO("Button double clicked exit\n");
-        // }
-        // else if (button_pressed) {
-        //     if (led_is_on) {    
-        //         NRF_LOG_INFO("Button pressed enter");
-        //         button_pressed = false;
-
-        //         brightness_step--;
-        //         if (brightness_step < 1) {
-        //             brightness_step = 10; 
-        //         }
-        //         NRF_LOG_INFO("Cur step = %d", brightness_step);
-        //         NRF_LOG_INFO("Button pressed exit \n");
-        //     }
-        // }
-        // if (led_is_on) {
-        //     current_brightness += (direction * brightness_step);
+            button_double_clicked = false;
+            cur_mode++;
+            cur_mode %= 4;
+            set_led1_duty(0);
             
-        //     if (current_brightness >= 100) {
-        //         current_brightness = 100;
-        //         direction = -1;
-        //     } else if (current_brightness <= 0) {
-        //         current_brightness = 0;
-        //         direction = 1;
-        //         cur_color_index++;
-        //         if (cur_color_index >= col_arr_length) {
-        //             cur_color_index = 0;
-        //         }
-        //     }
-        // }
-        
-        // do_pwm_step(current_brightness  * 10, cur_color);
-        
-        // nrf_delay_ms(20);
-        // process_front_and_usb();
+            switch (cur_mode) {
+                case 0: // no input
+                    led1_blink_speed = 0;
+                    break;
+                case 1: // h selection
+                    led1_blink_speed = 10;
+                    break;
+                case 2: // s selection
+                    led1_blink_speed = 20;
+                    break;
+                case 3: // v selection
+                    set_led1_duty(255);
+                    led1_blink_speed = 0;
+                    break;
+            }
+
+            NRF_LOG_INFO("Button double clicked cur mode = %d, blink speed = %d", cur_mode, led1_blink_speed);
+        }
+        else if (button_pressed) {
+            switch (cur_mode) {
+                case 1: // h selection
+                    h++;
+                    h %= 360;
+                    break;
+                case 2: // s selection
+                    s++;
+                    s %= 100;
+                    break;
+                case 3: // v selection
+                    v++;
+                    v %= 100;
+                    break;
+            }
+            set_led_color_hsv(h, s, v);
+
+        }
+        if (led1_blink_speed > 0) {
+
+            current_brightness += (led1_blink_dir * led1_blink_speed);
+
+            if (current_brightness >= 255) {
+                    current_brightness = 255;
+                    led1_blink_dir = -1;
+            } else if (current_brightness <= 0) {
+                current_brightness = 0;
+                led1_blink_dir = 1;
+            }
+            set_led1_duty(current_brightness);
+        }
+        nrf_delay_ms(30);
+        process_front_and_usb();
     }
 }

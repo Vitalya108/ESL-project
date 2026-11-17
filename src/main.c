@@ -53,6 +53,9 @@ int main(void)
     int led1_blink_dir = 1;
     int led1_blink_speed = 0;
 
+    int s_dir = -1;
+    int v_dir = -1;
+
     while (true)
     {
         if (button_double_clicked) {
@@ -69,10 +72,10 @@ int main(void)
                     led1_blink_speed = 0;
                     break;
                 case 1: // h selection
-                    led1_blink_speed = 10;
+                    led1_blink_speed = 12;
                     break;
                 case 2: // s selection
-                    led1_blink_speed = 20;
+                    led1_blink_speed = 25;
                     break;
                 case 3: // v selection
                     set_led1_duty(255);
@@ -89,12 +92,16 @@ int main(void)
                     h %= 360;
                     break;
                 case 2: // s selection
-                    s++;
-                    s %= 100;
+                    s += s_dir;
+                    if (s <= 0 || s >= 100) {
+                        s_dir *= -1;
+                    }
                     break;
                 case 3: // v selection
-                    v++;
-                    v %= 100;
+                    v += v_dir;
+                    if (v <= 0 || v >= 100) {
+                        v_dir *= -1;
+                    }
                     break;
             }
             set_led_color_hsv(h, s, v);

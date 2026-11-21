@@ -14,7 +14,9 @@
 #include "hsv.h"
 
 #include "my_logs.h"                      
-#include "nrf_log.h"         
+#include "nrf_log.h"
+
+
 
 int main(void)
 {
@@ -41,9 +43,9 @@ int main(void)
     init_nrfx_pwm();
 
     // color vars
-    int h = 360 * 0.99;
-    int s = 100;
-    int v = 100;
+    uint16_t h = 360 * 0.99;
+    uint8_t s = 100;
+    uint8_t v = 100;
 
     int current_brightness = 0; 
 

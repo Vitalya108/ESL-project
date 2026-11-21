@@ -36,13 +36,13 @@ void set_led1_duty(int duty) {
     nrfx_pwm_simple_playback(&m_pwm0, &m_seq, 1, NRFX_PWM_FLAG_LOOP);
 }
 
-void set_led_color_hsv(int h, int s, int v) {
-    int r, g, b;
+void set_led_color_hsv(uint16_t h, uint8_t s, uint8_t v) {
+    uint8_t r, g, b;
     hsv_to_rgb(h, s, v, &r, &g, &b);
     set_led_color_rgb(r, g, b);
 }
 
-void set_led_color_rgb(int r, int g, int b) {
+void set_led_color_rgb(uint8_t r, uint8_t g, uint8_t b) {
     m_pwm_values.channel_0 = r;
     m_pwm_values.channel_1 = g;
     m_pwm_values.channel_2 = b;

@@ -1,6 +1,8 @@
 #ifndef HSV_H
 #define HSV_H
 
-void hsv_to_rgb(int h, int s, int v, int *r, int *g, int *b);
+#include <stdint.h>
+
+void hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v, uint8_t *r, uint8_t *g, uint8_t *b);
 
 #endif

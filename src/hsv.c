@@ -1,6 +1,6 @@
 #include "hsv.h"
 
-void hsv_to_rgb(int h, int s, int v, int *r, int *g, int *b) {
+void hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v, uint8_t *r, uint8_t *g, uint8_t *b) {
     h %= 360;
     if (h < 0) h += 360;
     if (s < 0) s = 0;

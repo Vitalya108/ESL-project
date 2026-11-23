@@ -16,7 +16,7 @@
 #include "my_logs.h"                      
 #include "nrf_log.h"
 
-
+#include "nvmc_utils.h"
 
 int main(void)
 {
@@ -43,10 +43,18 @@ int main(void)
     init_nrfx_pwm();
 
     // color vars
-    uint16_t h = 360 * 0.99;
-    uint8_t s = 100;
-    uint8_t v = 100;
+    uint16_t h;
+    uint8_t s;
+    uint8_t v;
 
+    if (load_color_from_flash(&h, &s, &v)) {
+        NRF_LOG_INFO("Colors loaded succesfully! h = %d, s = %d, v = %d. \n", h, s, v);
+    } else {
+        NRF_LOG_INFO("No colors to load. \n");
+        h = 360 * 0.99;
+        s = 100;        
+        v = 100;
+    }
     int current_brightness = 0; 
 
     // hsv color initialization
@@ -62,16 +70,18 @@ int main(void)
     {
         if (button_double_clicked) {
 
-            NRF_LOG_INFO("Button double clicked cur mode = %d, blink speed = %d", cur_mode, led1_blink_speed);
-            
             button_double_clicked = false;
             cur_mode++;
             cur_mode %= 4;
             set_led1_duty(0);
             
+            NRF_LOG_INFO("Button double clicked enter:\n \tcurrent mode: %d, current colors: h = %d, s = %d, v = %d\n", cur_mode, h, s, v);
+
             switch (cur_mode) {
                 case 0: // no input
                     led1_blink_speed = 0;
+                    save_color_to_flash(h, s, v);
+                    NRF_LOG_INFO("Colors saved succesfuly in addres = %d!\n", APP_DATA_START_ADDR);
                     break;
                 case 1: // h selection
                     led1_blink_speed = 12;
@@ -84,8 +94,6 @@ int main(void)
                     led1_blink_speed = 0;
                     break;
             }
-
-            NRF_LOG_INFO("Button double clicked cur mode = %d, blink speed = %d", cur_mode, led1_blink_speed);
         }
         else if (button_pressed) {
             switch (cur_mode) {

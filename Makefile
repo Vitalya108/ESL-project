@@ -17,13 +17,14 @@ SRC_FILES += \
   $(SDK_ROOT)/components/boards/boards.c \
   $(PROJ_DIR)/src/main.c \
   $(PROJ_DIR)/src/leds_switch.c \
-  $(PROJ_DIR)/src/pwm.c \
+  $(PROJ_DIR)/src/nvmc_utils.c \
   $(PROJ_DIR)/src/interrupts.c \
   $(PROJ_DIR)/src/hsv.c \
   $(PROJ_DIR)/src/app_timer_utils.c \
   $(PROJ_DIR)/src/my_logs.c \
   $(PROJ_DIR)/src/nrfx_pwm_utils.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_systick.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_nvmc.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_gpiote.c \
   $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c \
   $(SDK_ROOT)/components/libraries/timer/app_timer2.c \
@@ -111,6 +112,7 @@ OPT = -O3 -g3
 
 # C flags common to all targets
 CFLAGS += $(OPT)
+CFLAGS += -DNRFX_NVMC_ENABLED=1
 CFLAGS += -DUSE_APP_CONFIG
 CFLAGS += -DBOARD_PCA10059
 CFLAGS += -DBSP_DEFINES_ONLY

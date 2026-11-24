@@ -81,7 +81,7 @@ int main(void)
                 case 0: // no input
                     led1_blink_speed = 0;
                     save_color_to_flash(h, s, v);
-                    NRF_LOG_INFO("Colors saved succesfuly in addres = %d!\n", APP_DATA_START_ADDR);
+                    NRF_LOG_INFO("Colors saved succesfuly in addres = 0x%X!\n", (uint32_t)APP_DATA_START_ADDR);
                     break;
                 case 1: // h selection
                     led1_blink_speed = 12;
